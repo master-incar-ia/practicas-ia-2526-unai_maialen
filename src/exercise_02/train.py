@@ -10,6 +10,7 @@ from tqdm import tqdm
 from .dataset import NoisyRegressionDataset
 from .model import MultiPerceptron
 
+
 def get_device(force: str = "auto") -> torch.device:
     """Return a torch.device based on the `force` option.
 
@@ -23,9 +24,10 @@ def get_device(force: str = "auto") -> torch.device:
     # auto
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 def train_model(output_folder: Path, device: torch.device):
     # Create an instance of the dataset
-    dataset = NoisyRegressionDataset(size=10000)
+    dataset = NoisyRegressionDataset(size=10000, normalize=True)
 
     # Split the dataset into train, validation, and test sets
     train_size = int(0.7 * len(dataset))
@@ -43,7 +45,7 @@ def train_model(output_folder: Path, device: torch.device):
     # Define the model, loss function, and optimizer
     input_dim = 1
     output_dim = 1
-    model = MultiPerceptron(input_dim, [16, 8],output_dim).to(device)
+    model = MultiPerceptron(input_dim, [16, 8], output_dim).to(device)
     criterion = nn.MSELoss()
     optimizer = optim.AdamW(model.parameters(), lr=0.0001)
 
@@ -64,8 +66,6 @@ def train_model(output_folder: Path, device: torch.device):
             targets_cuda = targets.to(device)
             outputs = model(inputs_cuda, use_activation=False)
             loss = criterion(outputs, targets_cuda)
-
-
 
             train_loss += loss.item()
 
@@ -97,7 +97,7 @@ def train_model(output_folder: Path, device: torch.device):
 
         if (epoch + 1) % 10 == 0:
             print(
-                f"Epoch [{epoch+1}/{num_epochs}], Train Loss: {train_loss:.4f}, Validation Loss: {val_loss:.4f}"
+                f"Epoch [{epoch + 1}/{num_epochs}], Train Loss: {train_loss:.4f}, Validation Loss: {val_loss:.4f}"
             )
 
     print(f"Best validation loss: {best_val_loss:.4f}, Model saved to {best_model_path}")
@@ -115,16 +115,15 @@ def train_model(output_folder: Path, device: torch.device):
     plt.savefig(output_folder / "loss_plot.png")
     plt.savefig(output_folder / "loss_plot.png")
 
+
 if __name__ == "__main__":
     # Create output folder based on file folder
-    output_folder = Path(__file__).parent.parent.parent / "outs" / Path(__file__).parent.name  
+    output_folder = Path(__file__).parent.parent.parent / "outs" / Path(__file__).parent.name
     output_folder.mkdir(exist_ok=True, parents=True)
 
-    device = get_device("auto") # choices are "auto", "cpu", "cuda"
+    device = get_device("auto")  # choices are "auto", "cpu", "cuda"
     print(f"Using device: {device}")
     train_model(output_folder, device=device)
 
     # Set the seed for reproducibility
     torch.manual_seed(42)
-    
-    

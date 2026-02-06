@@ -11,7 +11,7 @@ from .dataset import NoisyRegressionDataset
 from .model import MultiPerceptron
 
 
-def evaluate_and_plot(loader,model, dataset_name, output_folder):
+def evaluate_and_plot(loader, model, dataset_name, output_folder):
     model.eval()
     all_inputs = []
     all_outputs = []
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     # Set the seed for reproducibility
     torch.manual_seed(42)
     # Create an instance of the dataset
-    dataset = NoisyRegressionDataset(size=10000)
+    dataset = NoisyRegressionDataset(size=10000, normalize=True)
 
     # Split the dataset into train, validation, and test sets
     train_size = int(0.7 * len(dataset))
