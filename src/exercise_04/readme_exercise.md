@@ -16,7 +16,13 @@ Compare both methods and discuss the differences
 
 ## Task Formalization
 
-Write your answer here
+Objetivo: Problema de clasificacion de imagenes.
+Problema: 
+La tabla de clases
+PL4 CNN (funciona bien) Y en la 5 con la fully vconnected (funciona mal). Como son las imagenes muy pequeñas, si funciona mas o menos bien.
+One Shot para que la enquiry al dataset no salga un num (como 6) sino (0 0 0 0 0 1 0 0 0 0).
+train, model, evaluate (este es clasificacion --> hacer la matriz de confusion). Metricas de interes: f1 score.
+La PL5--> ponemos convolucionales y decimos que funciona peor que CNN.
 
 ### Task Formalization (Inference)
 

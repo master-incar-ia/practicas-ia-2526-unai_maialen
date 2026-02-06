@@ -3,18 +3,21 @@
 
 ## Objective
 
-Estimation of a unknown function by a machine learning model
+Se quiere implementar un flujo completo de aprendizaje supervisado para una tarea de regresión con datos sintéticos NO LINEALES ruidosos. 
 
 ## Task Formalization
 
-Write your answer here
+Debe generarse un conjunto de datos mediante una función no lineal con ruido y encapsularlo como un dataset compatible con PyTorch. Luego se debe entrenar el modelo con una función de pérdida adecuada, seleccione el mejor modelo según la pérdida de validación y registre las curvas de pérdida. 
 
 ### Task Formalization (Inference)
 
-Write your answer here
+Se debe implementar un módulo de evaluación que cargue un modelo entrenado, evalúe su desempeño en los conjuntos de entrenamiento, validación y prueba, calcule métricas de regresión (R2, MAE, MSE), y genere gráficos de comparación entre valores reales y predichos. Además, debe guardar las métricas en CSV y como imagen, junto con los gráficos en la carpeta de salida.
+
 ### Task Formalization (Training)
 
-Write your answer here
+Definir un modelo para predecir la salida y construir un proceso de entrenamiento que divida los datos en entrenamiento y validación. Luego se debe entrenar el modelo con una función de pérdida adecuada.
+
+Finalmente se selecciona y guarda el mejor modelo según la pérdida de validación, y se plotea la curva de pérdidas.
 
 ## Evaluation metrics
 
@@ -24,15 +27,18 @@ Write your answer here
 
 ### Dataset description
 
-Write your answer here
+Datos sintéticos 1D de regresión con ruido, generados como:
+y = −3x^2 + 5x + δ
 
 ### Data preparation and preprocessing
 
-Write your answer here
+Generación de x uniforme y añadido de ruido gaussiano.
+
+Se reestructura a tensores columna y se particiona en train/val/test.
 
 ### Data augmentation
 
-Write your answer here
+No se ha implementado.
 
 ## Model Considerations
 

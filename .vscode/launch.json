@@ -74,5 +74,12 @@
             "module": "src.exercise_02.evaluate",
             "console": "integratedTerminal"
         },
+        {
+            "name": "exercise_04.dataset",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.exercise_04.dataset",
+            "console": "integratedTerminal"
+        },
          ]
 }
