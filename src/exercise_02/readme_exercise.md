@@ -72,13 +72,13 @@ El modelo tiene aproximadamente 300 parámetros (weights + biases). La arquitect
 
 ## Training
 
-El modelo se entrenó durante 100 épocas usando el algoritmo de retropropagación. Se monitorizó la pérdida de validación en cada época, guardando los mejores pesos cuando la validación mejoraba.
+El modelo se entrenó durante 40 épocas usando el algoritmo de retropropagación. Se monitorizó la pérdida de validación en cada época, guardando los mejores pesos cuando la validación mejoraba.
 
 ### Training hyperparameters
 
 Batch size: 10
 Learning rate: 0.0001
-Epocas: 100
+Epocas: 40
 División(train/val/test):70%/15%/15%
 
 ### Loss function graph
@@ -92,7 +92,7 @@ División(train/val/test):70%/15%/15%
 
 Epocas 1-5: Descenso muy rápido. El modelo identifica rápidamente que se trata de una función cuadrática con ruido. La pérdida de validación sigue de cerca a la de entrenamiento.
 
-Epocas 6-100: La pérdida se mantiene prácticamente constante en valores muy bajos. Indica convergencia completa.
+Epocas 6-40: La pérdida se mantiene prácticamente constante en valores muy bajos. Indica convergencia completa.
 
 ## Evaluation
 
@@ -151,13 +151,20 @@ Al ser R²=1.0 hay limitaciones para mejorar el modelo, pero una opción podría
 
 How this model will generalize to new data?
 
+### How this model will generalize to new data?
+
+Las métricas son idénticas en train/val/test (R²=1.0, MAE=0.003, MSE=0), lo que prueba que el modelo aprendió la función real sin sobreajustar. Generalizará perfectamente a nuevos datos que sigan la misma distribución.
+
 
 ## Design Feedback loops
 
-Describe the process you have followed to improve the model and the evolution of performance of the model during the process.
+Inicialmente se probó con SimplePerceptron (modelo lineal simple) aunque sabíamos que no sería suficiente para una función cuadrática. 
 
-You can include a table stating the chanched parameters and the obtained results after the process.
+Luego implementamos MultiPerceptron con arquitectura [1→16→8→1] (dos capas ocultas con 16 y 8 neuronas respectivamente, activaciones ReLU). Esta arquitectura mejoró el rendimiento a R² = 1.0, MAE = 0.003 y MSE ≈ 0.
 
+Con 100 épocas de entrenamiento inicial, observamos que el modelo convergía muy rápidamente (en épocas 1-5), mientras que las épocas 6-100 no generaban cambios significativos en la pérdida. Esto nos llevó a reducir a 40 épocas, manteniendo exactamente el mismo rendimiento: R² = 1.0, MAE = 0.003 y MSE ≈ 0.
+
+Conclusión: La arquitectura [16, 8] es óptima para esta tarea. Reducir épocas de 100 a 40 no afecta el rendimiento pero ahorra tiempo de entrenamiento significativamente. El modelo ha alcanzado su máximo potencial sin necesidad de más complejidad.
 
 ## Questions
 
