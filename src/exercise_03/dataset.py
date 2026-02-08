@@ -11,18 +11,39 @@ from torch.utils.data import Dataset
 
 
 class NoisyRegressionDataset(Dataset):
-    def __init__(self, noise_std=20, size=100, seed=42):
+    def __init__(self, noise_std=20, size=100, seed=42, normalize_x=False, normalize_y=False):
         np.random.seed(seed)
-        self.x = np.random.uniform(0, 100, size=(size,))
-        self.delta = np.random.normal(0, noise_std, size=(size,))
-        self.y = 100 * np.sin(8 * numpy.pi * self.x / 100) + 2 + self.delta
+        x = np.random.uniform(0, 100, size=(size,))
+        delta = np.random.normal(0, noise_std, size=(size,))
+        y = 100 * np.sin(8 * numpy.pi * x / 100) + 2 + delta
+
+        # Keep raw values for visualization or inverse transforms.
+        self.x_raw = x
+        self.y_raw = y
+
         # Create a DataFrame for visualization
-        df = pd.DataFrame(data=np.array([self.x, self.y]).transpose(), columns=["x", "y"])
+        df = pd.DataFrame(data=np.array([x, y]).transpose(), columns=["x", "y"])
         self.df = df
 
+        if normalize_x:
+            self.x_min = float(x.min())
+            self.x_max = float(x.max())
+            x = (x - self.x_min) / (self.x_max - self.x_min + 1e-8)
+        else:
+            self.x_min = None
+            self.x_max = None
+
+        if normalize_y:
+            self.y_mean = float(y.mean())
+            self.y_std = float(y.std())
+            y = (y - self.y_mean) / (self.y_std + 1e-8)
+        else:
+            self.y_mean = None
+            self.y_std = None
+
         # Reshape for PyTorch compatibility
-        self.x = self.x.reshape((-1, 1))
-        self.y = self.y.reshape((-1, 1))
+        self.x = x.reshape((-1, 1))
+        self.y = y.reshape((-1, 1))
 
     def plot(self, filepath):
         ax = sns.scatterplot(self.df, x="x", y="y")
@@ -40,7 +61,7 @@ class NoisyRegressionDataset(Dataset):
 
 
 if __name__ == "__main__":
-    output_folder = Path(__file__).parent.parent.parent / "outs" / Path(__file__).parent.name 
+    output_folder = Path(__file__).parent.parent.parent / "outs" / Path(__file__).parent.name
     output_folder.mkdir(exist_ok=True, parents=True)
 
     dataset = NoisyRegressionDataset()

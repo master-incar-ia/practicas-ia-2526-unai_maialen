@@ -98,7 +98,7 @@ if __name__ == "__main__":
     # Set the seed for reproducibility
     torch.manual_seed(42)
     # Create an instance of the dataset
-    dataset = NoisyRegressionDataset(size=10000)
+    dataset = NoisyRegressionDataset(size=10000, normalize_x=True, normalize_y=True)
 
     # Split the dataset into train, validation, and test sets
     train_size = int(0.7 * len(dataset))

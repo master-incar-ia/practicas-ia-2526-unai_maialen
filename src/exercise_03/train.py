@@ -27,7 +27,7 @@ def get_device(force: str = "auto") -> torch.device:
 
 def train_model(output_folder: Path, device: torch.device):
     # Create an instance of the dataset
-    dataset = NoisyRegressionDataset(size=10000)
+    dataset = NoisyRegressionDataset(size=10000, normalize_x=True, normalize_y=True)
 
     # Split the dataset into train, validation, and test sets
     train_size = int(0.7 * len(dataset))
@@ -50,7 +50,7 @@ def train_model(output_folder: Path, device: torch.device):
     optimizer = optim.AdamW(model.parameters(), lr=0.0001)
 
     # Training loop with validation and saving best weights
-    num_epochs = 1000
+    num_epochs = 100
     best_val_loss = float("inf")
     best_model_path = output_folder / "best_model.pth"
 
