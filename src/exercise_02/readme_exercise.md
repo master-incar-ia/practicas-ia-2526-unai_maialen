@@ -1,5 +1,5 @@
 
-# Exercise 1: Learn a linear function with PyTorch
+# Exercise 2: Learn a linear function with PyTorch
 
 ## Objective
 
@@ -7,15 +7,19 @@ Se quiere implementar un flujo completo de aprendizaje supervisado para una tare
 
 ## Task Formalization
 
-Debe generarse un conjunto de datos mediante una función no lineal con ruido y encapsularlo como un dataset compatible con PyTorch. Luego se debe entrenar el modelo con una función de pérdida adecuada, seleccione el mejor modelo según la pérdida de validación y registre las curvas de pérdida. 
+Debe generarse un conjunto de datos mediante una función no lineal con ruido y encapsularlo como un dataset compatible con PyTorch. 
+
+Luego se debe entrenar el modelo con una función de pérdida adecuada, seleccionar el mejor modelo según la pérdida de validación y registrar las curvas de pérdida. 
 
 ### Task Formalization (Inference)
 
-Se debe implementar un módulo de evaluación que cargue un modelo entrenado, evalúe su desempeño en los conjuntos de entrenamiento, validación y prueba, calcule métricas de regresión (R2, MAE, MSE), y genere gráficos de comparación entre valores reales y predichos. Además, debe guardar las métricas en CSV y como imagen, junto con los gráficos en la carpeta de salida.
+Se debe implementar un módulo de evaluación que cargue un modelo entrenado, evalúe su desempeño en los conjuntos de entrenamiento, validación y prueba, calcule métricas de regresión (R2, MAE, MSE), y genere gráficos de comparación entre valores reales y predichos. 
+
+Además, debe guardar las métricas en CSV y como imagen, junto con los gráficos en la carpeta de salida.
 
 ### Task Formalization (Training)
 
-Definir un modelo para predecir la salida y construir un proceso de entrenamiento que divida los datos en entrenamiento y validación. Luego se debe entrenar el modelo con una función de pérdida adecuada.
+Primero se define un modelo para predecir la salida. Luego se construye un proceso de entrenamiento que divide los datos en entrenamiento y validación para entrenar el modelo con una función de pérdida adecuada.
 
 Finalmente se selecciona y guarda el mejor modelo según la pérdida de validación, y se plotea la curva de pérdidas.
 
@@ -27,7 +31,7 @@ R² (Coeficiente de determinación), MAE (Error Absoluto Medio) y MSE (Error Cua
 
 ### Dataset description
 
-Datos sintéticos 1D de regresión con ruido, generados como:
+Datos sintéticos de 1D de regresión con ruido, generados como:
 y = −3x^2 + 5x + δ
 
 ### Data preparation and preprocessing
@@ -76,10 +80,10 @@ El modelo se entrenó durante 40 épocas usando el algoritmo de retropropagació
 
 ### Training hyperparameters
 
-Batch size: 10
-Learning rate: 0.0001
-Epocas: 40
-División(train/val/test):70%/15%/15%
+- Batch size: 10
+- Learning rate: 0.0001
+- Epocas: 40
+- División(train/val/test): 70%/15%/15%
 
 ### Loss function graph
 
