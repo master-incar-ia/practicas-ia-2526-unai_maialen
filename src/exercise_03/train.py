@@ -45,12 +45,12 @@ def train_model(output_folder: Path, device: torch.device):
     # Define the model, loss function, and optimizer
     input_dim = 1
     output_dim = 1
-    model = MultiPerceptron(input_dim, [64, 32, 16], output_dim).to(device)
+    model = MultiPerceptron(input_dim, [256, 128, 64], output_dim).to(device)
     criterion = nn.MSELoss()
     optimizer = optim.AdamW(model.parameters(), lr=0.0001)
 
     # Training loop with validation and saving best weights
-    num_epochs = 100
+    num_epochs = 1000
     best_val_loss = float("inf")
     best_model_path = output_folder / "best_model.pth"
 

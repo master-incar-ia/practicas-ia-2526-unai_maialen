@@ -26,7 +26,7 @@ class MultiPerceptron(nn.Module):
 
 
 if __name__ == "__main__":
-    model = MultiPerceptron(1, [64, 32, 16], 1)
+    model = MultiPerceptron(1, [256, 128, 64], 1)
     print(model)
     x = torch.tensor([[1.0]])
     print(model(x))
