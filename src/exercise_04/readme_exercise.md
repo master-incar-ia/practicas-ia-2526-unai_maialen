@@ -63,7 +63,9 @@ Write your answer here
 
 ### Possible architectures
 
-Write your answer here
+Para CIFAR-10 suele bastar con 3 bloques convolucionales (6–8 capas conv en total) + 1–2 capas densas, porque las imagenes son pequenas (32x32) y el dataset es moderado.
+Con 3 niveles de downsampling (32->16->8->4) ya capturas jerarquias de bordes, texturas y partes; mas profundidad mejora algo pero aumenta sobreajuste y costo.
+Un modelo mucho mas profundo solo se justifica si tienes regularizacion/augmentacion fuerte y mas datos, o si buscas SOTA.
 
 ### Last layer activation
 
