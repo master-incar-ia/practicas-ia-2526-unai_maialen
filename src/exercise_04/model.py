@@ -3,36 +3,43 @@ import torch.nn as nn
 
 
 class Cifar10CNN(nn.Module):
-    """CNN optimizado para sistemas con recursos limitados usando Global Average Pooling."""
+    """VGG‑like network with two convolutional blocks and softmax output.
+
+    Each block follows the VGG pattern: conv→ReLU→pool. The first block
+    produces 16 channels, the second 32. After pooling, a small classifier
+    flattens the features and applies two linear layers, finishing with a
+    softmax to yield class probabilities.
+    """
 
     def __init__(self, num_classes=10):
         super().__init__()
 
-        # Feature extractor con menos canales para reducir parámetros
-        # Reducimos de 16->32 canales a 8->16 canales
+        # two VGG blocks
         self.features = nn.Sequential(
-            nn.Conv2d(3, 8, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(8, 16, kernel_size=3, padding=1),
-            nn.ReLU(),
+            # block 1: 3 -> 16
+            nn.Conv2d(3, 16, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            # block 2: 16 -> 32
+            nn.Conv2d(16, 32, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
         )
 
-        # Global Average Pooling para reducir drasticamente los parámetros
-        # Convierte feature maps de [B, 16, 16, 16] a [B, 16, 1, 1]
-        self.global_avg_pool = nn.AdaptiveAvgPool2d((1, 1))
-
-        # Clasificador mucho más simple y liviano
+        # classifier after two pools: feature map size 32 x 8 x 8
         self.classifier = nn.Sequential(
-            nn.Flatten(),  # [B, 16, 1, 1] -> [B, 16]
-            nn.Dropout(p=0.2),  # Menor dropout porque el modelo es más simple
-            nn.Linear(16, num_classes),  # Directamente de 16 a 10 clases
+            nn.Flatten(),
+            nn.Linear(32 * 8 * 8, 256),
+            nn.ReLU(inplace=True),
+            nn.Dropout(p=0.3),
+            nn.Linear(256, num_classes),
+            nn.Softmax(dim=1),
         )
 
     def forward(self, x):
         x = self.features(x)
-        x = self.global_avg_pool(x)  # Reduce spatial dimensions to 1x1
-        return self.classifier(x)
+        x = self.classifier(x)
+        return x
 
 
 if __name__ == "__main__":

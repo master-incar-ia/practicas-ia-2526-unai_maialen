@@ -102,7 +102,7 @@ def train_model(output_folder: Path, device: torch.device):
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=8, gamma=0.7)
 
     # Menos épocas para entrenamiento más rápido
-    num_epochs = 30
+    num_epochs = 60
     best_val_acc = 0.0
     best_model_path = output_folder / "best_model.pth"
 
