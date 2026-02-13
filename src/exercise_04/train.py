@@ -97,7 +97,7 @@ def train_model(output_folder: Path, device: torch.device):
     optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=5e-4)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 
-    num_epochs = 30
+    num_epochs = 70
     best_val_acc = 0.0
     best_model_path = output_folder / "best_model.pth"
 
