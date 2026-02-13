@@ -58,9 +58,9 @@ def train_model(output_folder: Path, device: torch.device):
     train_full_eval = CIFAR10Dataset(root, train=True, transform=eval_transform, download=False)
     # test_dataset eliminado - solo para evaluate.py
 
-    # Split train into train/val with shared indices
-    train_size = int(0.9 * len(train_full))
-    val_size = len(train_full) - train_size
+    # Split train into train/val with different ratio
+    train_size = int(0.8 * len(train_full))  # 80% train (40k)
+    val_size = len(train_full) - train_size  # 20% val (10k)
     train_subset, val_subset = random_split(
         range(len(train_full)), [train_size, val_size], generator=torch.Generator().manual_seed(42)
     )

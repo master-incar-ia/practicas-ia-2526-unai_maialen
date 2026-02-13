@@ -67,7 +67,7 @@ def evaluate_and_plot(loader, model, dataset_name, class_names, output_folder, d
     # Confusion matrix plot
     plt.figure(figsize=(10, 8))
     sns.heatmap(
-        cm, annot=False, fmt="d", cmap="Blues", xticklabels=class_names, yticklabels=class_names
+        cm, annot=True, fmt="d", cmap="Blues", xticklabels=class_names, yticklabels=class_names
     )
     plt.xlabel("Predicted")
     plt.ylabel("True")

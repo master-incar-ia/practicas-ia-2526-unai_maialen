@@ -39,7 +39,90 @@ Write your answer here
 
 ### Dataset description
 
-Write your answer here
+#### CIFAR-10 Dataset Overview
+
+El dataset CIFAR-10 consiste en **60,000 imágenes en color de 32x32 píxeles** divididas en **10 clases** (airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck), con 6,000 imágenes por clase.
+
+**Distribución original de CIFAR-10:**
+- **`train=True`**: 50,000 imágenes (conjunto de entrenamiento)
+- **`train=False`**: 10,000 imágenes (conjunto de test)
+
+#### Partición de Datasets: Train, Validation y Test
+
+En Machine Learning es fundamental dividir los datos en **3 conjuntos independientes**:
+
+| **Conjunto** | **Propósito** | **¿Cuándo se usa?** |
+|--------------|---------------|-------------------|
+| **Train** | Entrenar el modelo (ajustar pesos) | Durante cada época de entrenamiento |
+| **Validation** | Seleccionar mejor modelo y ajustar hiperparámetros | Durante entrenamiento para early stopping |
+| **Test** | Evaluación final del modelo | **Solo al final**, para reportar rendimiento real |
+
+#### Metodología Correcta vs. Opción del Profesor
+
+##### ✅ **Metodología Estándar (Recomendada):**
+```python
+# Descargar datasets originales
+train_cifar10 = CIFAR10Dataset(root, train=True, ...)   # 50,000 muestras
+test_cifar10 = CIFAR10Dataset(root, train=False, ...)   # 10,000 muestras
+
+# Partir train_cifar10 en train + validation
+train_dataset = train_cifar10[:40,000]  # 40k para entrenar
+val_dataset = train_cifar10[40,000:]    # 10k para validación
+test_dataset = test_cifar10             # 10k para test final
+```
+
+**Distribución final:** 40k train + 10k validation + 10k test
+
+##### ⚠️ **Opción del Profesor (Metodológicamente Cuestionable):**
+```python
+# Usar test original como validation
+train_dataset = CIFAR10Dataset(root, train=True, ...)   # 50k para entrenar
+val_dataset = CIFAR10Dataset(root, train=False, ...)    # 10k test como validation
+# ¿No hay test verdadero?
+```
+
+#### 🚨 **Peligros de Usar Test como Validation:**
+
+##### **1. Data Leakage (Filtración de Datos)**
+- El modelo "ve" el conjunto de test durante el entrenamiento
+- Se pierde la evaluación completamente ciega
+- **Resultado**: Optimismo sesgado en las métricas finales
+
+##### **2. Overfitting a la Evaluación**
+- Los hiperparámetros se ajustan según el "test" (ahora validation)
+- El modelo se especializa en ese conjunto específico
+- **Resultado**: Rendimiento inflado, no generalizable
+
+##### **3. No Hay Evaluación Final Verdadera**
+- Sin conjunto realmente "unseen", no sabemos el rendimiento real
+- Imposible detectar sobreajuste metodológico
+- **Resultado**: Confianza falsa en el modelo
+
+##### **4. Violación de Principios ML**
+- Rompe la separación fundamental de conjuntos
+- Invalidates la validación experimental
+- **Resultado**: Metodología científicamente incorrecta
+
+#### 📋 **Implementación Actual en el Proyecto**
+
+En este ejercicio hemos optado por la **metodología correcta**:
+
+```python
+# Partición 80/20 del conjunto de entrenamiento original
+train_size = int(0.8 * len(train_full))  # 40,000 muestras
+val_size = len(train_full) - train_size   # 10,000 muestras
+
+# Train y validation del mismo conjunto original (train=True)
+train_dataset = Subset(train_full, train_indices)
+val_dataset = Subset(train_full_eval, val_indices) 
+
+# Test se mantiene separado para evaluate.py
+test_dataset = CIFAR10Dataset(root, train=False, ...)  # 10,000 muestras
+```
+
+**Distribución final:** **40k train + 10k validation + 10k test**
+
+Esta aproximación mantiene la **integridad metodológica** y permite una **evaluación confiable** del rendimiento del modelo.
 
 ### Data preparation and preprocessing
 
