@@ -56,7 +56,7 @@ def train_model(output_folder: Path, device: torch.device):
     root = Path(__file__).parent.parent.parent / "data"
     train_full = CIFAR10Dataset(root, train=True, transform=train_transform, download=True)
     train_full_eval = CIFAR10Dataset(root, train=True, transform=eval_transform, download=False)
-    test_dataset = CIFAR10Dataset(root, train=False, transform=eval_transform, download=False)
+    # test_dataset eliminado - solo para evaluate.py
 
     # Split train into train/val with shared indices
     train_size = int(0.9 * len(train_full))
@@ -69,7 +69,7 @@ def train_model(output_folder: Path, device: torch.device):
 
     # DataLoaders optimizados para recursos limitados
     pin_memory = device.type == "cuda"
-    batch_size = 16  # Reducido de 32 a 16 para usar menos memoria
+    batch_size = 32  # Reducido de 32 a 16 para usar menos memoria
 
     train_loader = DataLoader(
         train_dataset,
@@ -85,13 +85,6 @@ def train_model(output_folder: Path, device: torch.device):
         pin_memory=pin_memory,
         num_workers=0,
     )
-    test_loader = DataLoader(
-        test_dataset,
-        batch_size=batch_size,
-        shuffle=False,
-        pin_memory=pin_memory,
-        num_workers=0,
-    )
 
     # Model, loss, optimizer optimizados para recursos limitados
     model = Cifar10CNN(num_classes=10).to(device)
@@ -102,7 +95,7 @@ def train_model(output_folder: Path, device: torch.device):
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=8, gamma=0.7)
 
     # Menos épocas para entrenamiento más rápido
-    num_epochs = 30
+    num_epochs = 80
     best_val_acc = 0.0
     best_model_path = output_folder / "best_model.pth"
 
@@ -167,19 +160,6 @@ def train_model(output_folder: Path, device: torch.device):
             )
 
     print(f"Best validation acc: {best_val_acc:.3f}, Model saved to {best_model_path}")
-
-    # Test accuracy
-    model.load_state_dict(torch.load(best_model_path, map_location=device))
-    model.eval()
-    test_acc = 0.0
-    with torch.no_grad():
-        for inputs, targets in test_loader:
-            inputs = inputs.to(device)
-            targets = targets.to(device)
-            logits = model(inputs)
-            test_acc += _accuracy(logits, targets)
-    test_acc /= len(test_loader)
-    print(f"Test Acc: {test_acc:.3f}")
 
     # Plot losses
     plt.figure(figsize=(10, 5))
