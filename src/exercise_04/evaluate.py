@@ -146,11 +146,23 @@ if __name__ == "__main__":
     train_dataset = Subset(train_full_eval, train_subset.indices)
     val_dataset = Subset(train_full_eval, val_subset.indices)
 
-    # DataLoaders
+    # DataLoaders optimizados para recursos limitados
     pin_memory = device.type == "cuda"
-    train_loader = DataLoader(train_dataset, batch_size=256, shuffle=False, pin_memory=pin_memory)
-    val_loader = DataLoader(val_dataset, batch_size=256, shuffle=False, pin_memory=pin_memory)
-    test_loader = DataLoader(test_dataset, batch_size=256, shuffle=False, pin_memory=pin_memory)
+    batch_size = 32  # Reducido de 256 a 32 para evitar problemas de memoria
+
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        pin_memory=pin_memory,
+        num_workers=0,  # 0 para evitar problemas de multiprocessing en Windows
+    )
+    val_loader = DataLoader(
+        val_dataset, batch_size=batch_size, shuffle=False, pin_memory=pin_memory, num_workers=0
+    )
+    test_loader = DataLoader(
+        test_dataset, batch_size=batch_size, shuffle=False, pin_memory=pin_memory, num_workers=0
+    )
 
     # Load the best model weights
     model = Cifar10CNN(num_classes=10).to(device)

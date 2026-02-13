@@ -67,37 +67,42 @@ def train_model(output_folder: Path, device: torch.device):
     train_dataset = Subset(train_full, train_subset.indices)
     val_dataset = Subset(train_full_eval, val_subset.indices)
 
-    # DataLoaders
+    # DataLoaders optimizados para recursos limitados
     pin_memory = device.type == "cuda"
+    batch_size = 16  # Reducido de 32 a 16 para usar menos memoria
+
     train_loader = DataLoader(
         train_dataset,
-        batch_size=128,
+        batch_size=batch_size,
         shuffle=True,
         pin_memory=pin_memory,
-        num_workers=2,
+        num_workers=0,  # 0 para evitar problemas de multiprocessing en Windows
     )
     val_loader = DataLoader(
         val_dataset,
-        batch_size=256,
+        batch_size=batch_size,
         shuffle=False,
         pin_memory=pin_memory,
-        num_workers=2,
+        num_workers=0,
     )
     test_loader = DataLoader(
         test_dataset,
-        batch_size=256,
+        batch_size=batch_size,
         shuffle=False,
         pin_memory=pin_memory,
-        num_workers=2,
+        num_workers=0,
     )
 
-    # Model, loss, optimizer
+    # Model, loss, optimizer optimizados para recursos limitados
     model = Cifar10CNN(num_classes=10).to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=5e-4)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 
-    num_epochs = 70
+    # Learning rate más bajo para modelo más pequeño
+    optimizer = optim.AdamW(model.parameters(), lr=5e-4, weight_decay=1e-4)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=8, gamma=0.7)
+
+    # Menos épocas para entrenamiento más rápido
+    num_epochs = 30
     best_val_acc = 0.0
     best_model_path = output_folder / "best_model.pth"
 
