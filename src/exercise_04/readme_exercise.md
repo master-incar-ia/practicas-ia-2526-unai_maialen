@@ -3,37 +3,43 @@
 
 ## Objective
 
-Develop a model that can classify images from CIFAR-10 dataset
+En los ejercicios 4 y 5 se desarrolla un modelo capaz de clasificar imágenes del conjunto de datos CIFAR-10. 
 
-Then try a model with convolutional layers
-Create an evaluate.py file that evaluates the model and calculates and stores the evaluation metrics including a confusion matrix
+En el ejecicio 4 se implementa una red neuronal convolucional (CNN) y en el ejercicio 5 un modelo basado en un perceptrón multicapa (MLP) con capas FullyConnected.
 
+En cada ejercicio el archivo evaluate.py se encargará de evaluar los modelos entrenados y calcular métricas relevantes como la matriz de confusión, la accuracy y el F1-score. 
 
-Compare this method with previous one (previous exercise)
-Whats the effect of data augmentation?
+Finalmente, se comparan ambos enfoques y se analiza el impacto de la técnica de data augmentation en la capacidad de generalización del modelo.
 
-Compare both methods and discuss the differences
 
 ## Task Formalization
 
-Objetivo: Problema de clasificacion de imagenes.
-Problema: 
-La tabla de clases
-PL4 CNN (funciona bien) Y en la 5 con la fully vconnected (funciona mal). Como son las imagenes muy pequeñas, si funciona mas o menos bien.
-One Shot para que la enquiry al dataset no salga un num (como 6) sino (0 0 0 0 0 1 0 0 0 0).
-train, model, evaluate (este es clasificacion --> hacer la matriz de confusion). Metricas de interes: f1 score.
-La PL5--> ponemos convolucionales y decimos que funciona peor que CNN.
+El ejercicio es una tarea de clasificación supervisada de imágenes. 
+
+El modelo recibe como entrada imágenes pequeñas en color del dataset CIFAR-10 y debe asignarlas a una de las diez clases posibles. Las etiquetas se representan mediante codificación one-hot, de modo que cada clase se expresa como un vector binario con un único valor igual a uno. 
+
+El flujo general del sistema se compone de dos etapas: entrenamiento del modelo y validación, y evaluación final mediante métricas de clasificación. 
 
 ### Task Formalization (Inference)
 
-Write your answer here
+Durante la fase de inferencia se emplea imagenes del dataset CIFAR-10 nuca vistas antes para predecir la clase de imágenes.Se comprueba la capacidad del modelo para generalizar y se aplican las métricas.
+
 ### Task Formalization (Training)
 
-Write your answer here
+En la etapa de entrenamiento se optimizan los parámetros del modelo utilizando aprendizaje supervisado. El modelo convolucional procesa la imagen a través de filtros jerárquicos que extraen características espaciales relevantes antes de emitir una probabilidad por clase. La predicción final corresponde a la clase con mayor probabilidad estimada.
+
+Las imágenes del conjunto de entrenamiento pasan por vario filtros (kernel) hasta llegar a clasificar la imagen en una de las posibles categorias. EL modelo calcula la función de pérdida comparando las predicciones con las etiquetas reales y posteriormente se actualizan los pesos de los kernel utilizados. 
+
+La validación se realiza de forma periódica para supervisar la capacidad de generalización y seleccionar el mejor modelo.
 
 ## Evaluation metrics
 
-Write your answer here
+Para evaluar el rendimiento del modelo se utilizan métricas propias de clasificación multiclase. La accuracy mide la proporción de predicciones correctas sobre el total de muestras, mientras que el F1-score permite equilibrar precisión y exhaustividad en cada clase: 
+- Precisión: Proporción de predicciones positivas correctas (verdaderos positivos) sobre el total de predicciones positivas.
+
+- Recall (Exhaustividad): Proporción de casos positivos reales detectados correctamente.
+
+La matriz de confusión proporciona una visión detallada de los aciertos y errores por categoría, facilitando la identificación de patrones de confusión entre clases similares.
 
 ## Data Considerations
 
@@ -41,11 +47,7 @@ Write your answer here
 
 #### CIFAR-10 Dataset Overview
 
-El dataset CIFAR-10 consiste en **60,000 imágenes en color de 32x32 píxeles** divididas en **10 clases** (airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck), con 6,000 imágenes por clase.
-
-**Distribución original de CIFAR-10:**
-- **`train=True`**: 50,000 imágenes (conjunto de entrenamiento)
-- **`train=False`**: 10,000 imágenes (conjunto de test)
+El conjunto de datos CIFAR-10 está compuesto por 60.000 imágenes en color de 32x32 píxeles distribuidas equitativamente en diez clases: avión, automóvil, pájaro, gato, ciervo, perro, rana, caballo, barco y camión. El dataset original se divide en 50.000 imágenes para entrenamiento y 10.000 para prueba.
 
 #### Partición de Datasets: Train, Validation y Test
 
@@ -57,9 +59,9 @@ En Machine Learning es fundamental dividir los datos en **3 conjuntos independie
 | **Validation** | Seleccionar mejor modelo y ajustar hiperparámetros | Durante entrenamiento para early stopping |
 | **Test** | Evaluación final del modelo | **Solo al final**, para reportar rendimiento real |
 
-#### Metodología Correcta vs. Opción del Profesor
+#### Metodología seleccionada
 
-##### ✅ **Metodología Estándar (Recomendada):**
+##### **Metodología Estándar:**
 ```python
 # Descargar datasets originales
 train_cifar10 = CIFAR10Dataset(root, train=True, ...)   # 50,000 muestras
@@ -73,7 +75,7 @@ test_dataset = test_cifar10             # 10k para test final
 
 **Distribución final:** 40k train + 10k validation + 10k test
 
-##### ⚠️ **Opción del Profesor (Metodológicamente Cuestionable):**
+##### **Opción más simple:**
 ```python
 # Usar test original como validation
 train_dataset = CIFAR10Dataset(root, train=True, ...)   # 50k para entrenar
@@ -81,157 +83,48 @@ val_dataset = CIFAR10Dataset(root, train=False, ...)    # 10k test como validati
 # ¿No hay test verdadero?
 ```
 
-#### 🚨 **Peligros de Usar Test como Validation:**
+Se ha optado por la distribución estándar de dividir las imagenes de train entre train y validation para no afectar a las imagenes de test. Se ha elegido seguir esta metodologia ya que usar Test como Validation tiene varios inconvenientes. Se suele llamar Data Leakage, y ocurre cuando:
 
-##### **1. Data Leakage (Filtración de Datos)**
 - El modelo "ve" el conjunto de test durante el entrenamiento
-- Se pierde la evaluación completamente ciega
-- **Resultado**: Optimismo sesgado en las métricas finales
+- Se pierde la evaluación completamente ciega, los hiperparámetros se ajustan según el "test"
+- **Resultado**:  optimismo sesgado en las métricas finales, rendimiento inflado.
 
-##### **2. Overfitting a la Evaluación**
-- Los hiperparámetros se ajustan según el "test" (ahora validation)
-- El modelo se especializa en ese conjunto específico
-- **Resultado**: Rendimiento inflado, no generalizable
-
-##### **3. No Hay Evaluación Final Verdadera**
-- Sin conjunto realmente "unseen", no sabemos el rendimiento real
-- Imposible detectar sobreajuste metodológico
-- **Resultado**: Confianza falsa en el modelo
-
-##### **4. Violación de Principios ML**
-- Rompe la separación fundamental de conjuntos
-- Invalidates la validación experimental
-- **Resultado**: Metodología científicamente incorrecta
-
-#### 📋 **Implementación Actual en el Proyecto**
-
-En este ejercicio hemos optado por la **metodología correcta**:
-
-```python
-# Partición 80/20 del conjunto de entrenamiento original
-train_size = int(0.8 * len(train_full))  # 40,000 muestras
-val_size = len(train_full) - train_size   # 10,000 muestras
-
-# Train y validation del mismo conjunto original (train=True)
-train_dataset = Subset(train_full, train_indices)
-val_dataset = Subset(train_full_eval, val_indices) 
-
-# Test se mantiene separado para evaluate.py
-test_dataset = CIFAR10Dataset(root, train=False, ...)  # 10,000 muestras
-```
-
-**Distribución final:** **40k train + 10k validation + 10k test**
-
-Esta aproximación mantiene la **integridad metodológica** y permite una **evaluación confiable** del rendimiento del modelo.
 
 ### Data preparation and preprocessing
 
-Write your answer here
+Como se ha explicado anteriormente, se utiliza la división estándar de CIFAR-10:
+- **Train (40k, 80%)** + **Validation (10k, 20%)** del conjunto original de entrenamiento
+- **Test (10k)** se mantiene intacto para evaluación final
+- **Normalización**: Media y desviación estándar específicas de CIFAR-10
+- **Conversión a tensor**: Transformación de PIL Image a tensor PyTorch
 
 ### Data augmentation
 
-Write your answer here
+**Aplicado solo al conjunto de entrenamiento:**
+- **RandomHorizontalFlip()**: Volteo horizontal aleatorio para aumentar variabilidad
+- **RandomCrop(32, padding=4)**: Recortes aleatorios con padding para simular traslaciones
+- **Objetivo**: Mejorar la generalización del modelo CNN y reducir overfitting
 
 ## Model Considerations
 
-Write your answer here
+**Arquitectura CNN estilo VGGnet:**
+- **2 bloques convolucionales**: 3→16→32 canales con ReLU y MaxPooling
+- **Clasificador denso**: Flatten + Linear(8192→256) + ReLU + Dropout(0.3) + Linear(256→10)
+- **Activación final**: Softmax para probabilidades de clase
+- **Parámetros**: ~2.1M parámetros, adecuado para CIFAR-10
 
 ### Suitable Loss Functions
 
-Write your answer here
+**Para clasificación multiclase (10 clases CIFAR-10):**
+- **CrossEntropyLoss**: Combina LogSoftmax + NLLLoss, estándar para multiclase
+- **MultiMarginLoss**: Alternativa con margen, menos común
+- **FocalLoss**: Para datasets desbalanceados (no es el caso de CIFAR-10)
 
 ### Selected Loss Function
 
-Write your answer here
+Para una tarea de clasificación multiclase como CIFAR-10, la función de pérdida más adecuada es CrossEntropyLoss, ya que combina la aplicación de LogSoftmax con la pérdida negativa logarítmica, permitiendo trabajar directamente con los logits generados por el modelo..
 
 ### Possible architectures
-
-Para CIFAR-10 suele bastar con 3 bloques convolucionales (6–8 capas conv en total) + 1–2 capas densas, porque las imagenes son pequenas (32x32) y el dataset es moderado.
-Con 3 niveles de downsampling (32->16->8->4) ya capturas jerarquias de bordes, texturas y partes; mas profundidad mejora algo pero aumenta sobreajuste y costo.
-Un modelo mucho mas profundo solo se justifica si tienes regularizacion/augmentacion fuerte y mas datos, o si buscas SOTA.
-
-### Last layer activation
-
-Write your answer here
-
-### Other Considerations
-
-Write your answer here
-
-## Training
-
-Write your answer here
-
-### Training hyperparameters
-
-Write your answer here
-
-### Loss function graph
-
-![image](../../outs/exercise_05/loss_plot.png)
-
-### Discussion of the training process
-
-Write your answer here
-
-## Evaluation
-
-### Evaluation metrics
-
-Write your answer here
-
-![image](../../outs/exercise_05/train_regression_plot.png)
-
-![image](../../outs/exercise_05/validation_regression_plot.png)
-
-![image](../../outs/exercise_05/test_regression_plot.png)
-
-Metrics for each dataset is depicted: 
-
-![image](../../outs/exercise_05/metrics.png)
-
-### Evaluation results
-
-Here you have examples of evaluation results for train, validation and test sets.
-
-Example for train set:
-
-![image](../../outs/exercise_05/train_data_points_plot.png)
-
-
-Example for validation set:
-
-![image](../../outs/exercise_05/validation_data_points_plot.png)
-
-
-Example for test set:
-
-![image](../../outs/exercise_05/test_data_points_plot.png)
-
-
-### Discussion of the results
-
-How the model solves the problem?
-Is there overfitting, underfitting or any other issues? 
-How can we improve the model?
-How this model will generalize to new data?
-
-## Design Feedback loops
-
-Describe the process you have followed to improve the model and the evolution of performance of the model during the process.
-
-You can include a table stating the chanched parameters and the obtained results after the process.
-
-
-## Questions
-
-Pleaser answer the following questions. Include graphs if necessary. Store the graphs in the `outs/exercise_03` folder.
-
-### Which are the differences you found between previous model and this one?
-
-### Does the model generalizes well to new data?
-
----
 
 ## Modelo CNN Optimizado con Global Average Pooling
 
@@ -264,28 +157,16 @@ class Cifar10CNN(nn.Module):
         )
 ```
 
-### Parámetros de Entrenamiento Utilizados
-
 **Configuración optimizada para recursos limitados:**
 
 - **Batch Size**: 16 (reducido de 32 para menor uso de memoria)
 - **Épocas**: 30 (reducido de 70 para entrenamiento más rápido)  
 - **Learning Rate**: 5e-4 (ajustado para modelo más pequeño)
-- **Weight Decay**: 1e-4 (regularización moderada)
-- **Scheduler**: StepLR (step_size=8, gamma=0.7)
 - **Workers**: 0 (evita problemas de multiprocessing en Windows)
-
-### Reducción Drástica de Parámetros
-
-- **Modelo original**: ~2,100,000 parámetros (Linear: 32×16×16 → 256)
-- **Modelo optimizado**: ~1,500 parámetros (**99.9% de reducción**)
-- **Factor de reducción**: 1400x más pequeño
 
 ### Resultados del Modelo Original (Underfitting Severo)
 
-**⚠️ Las métricas obtenidas son extremadamente pobres y evidencian un underfitting severo:**
-
-#### Gráficos de Loss y Accuracy Anteriores
+#### Gráficos de Loss y Accuracy de modelo con GAP
 
 ![Loss del modelo anterior](../../outs/exercise_04/loss_plot_antiguo.png)
 
@@ -297,28 +178,11 @@ class Cifar10CNN(nn.Module):
 
 ### Análisis de Underfitting 
 
-**🔴 Problemas identificados:**
-
 1. **Capacidad insuficiente**: El modelo es demasiado simple para CIFAR-10
 2. **Loss alto en train y val**: Indica que no puede aprender patrones básicos
-3. **Accuracy muy baja**: ~10-20% (casi como clasificación aleatoria)
-4. **Gap train-val mínimo**: Pero ambos muy malos (underfitting, no overfitting)
+3. Accuracy muy baja
+4. La matriz de confusión muestra resultadospoco satisfactorios.
 
-**📊 Evidencias del underfitting:**
-- Loss de entrenamiento se estanca en valores altos
-- Accuracy de validación similar a train (ambas malas)  
-- Modelo no converge ni siquiera en datos de entrenamiento
-- Confusion matrix muestra predicciones casi aleatorias
-
-### Estrategias de Mejora Propuestas
-
-**Para balancear recursos vs. performance:**
-
-1. **Aumentar capacidad gradualmente**: 8→16→32 canales en lugar de 8→16
-2. **Añadir una capa conv más**: Mantener GAP pero más profundidad
-3. **Batch normalization**: Estabilizar entrenamiento sin muchos parámetros
-4. **Data augmentation más agresiva**: Mejorar generalización
-5. **Ensemble de modelos pequeños**: Combinar varios modelos simples
 
 El modelo actual sacrifica demasiado rendimiento por eficiencia. Se necesita encontrar un punto medio que mantenga viabilidad en recursos limitados pero permita aprendizaje efectivo.
 
@@ -328,7 +192,7 @@ El modelo actual sacrifica demasiado rendimiento por eficiencia. Se necesita enc
 
 ### Descripción del Cambio
 
-Debido al **underfitting severo** detectado en el modelo anterior, se decidió cambiar la arquitectura del **Global Average Pooling (GAP)** ultra-optimizado a una **arquitectura VGGnet más tradicional** que proporcione mayor capacidad de aprendizaje.
+Debido al **underfitting severo** detectado en el modelo anterior, se decidió cambiar la arquitectura del **Global Average Pooling (GAP)** a una **arquitectura VGGnet más tradicional** que proporcione mayor capacidad de aprendizaje.
 
 ### Tabla Comparativa de Arquitecturas
 
@@ -344,21 +208,6 @@ Debido al **underfitting severo** detectado en el modelo anterior, se decidió c
 | **Factor de Cambio** | Base | **1400x más parámetros** |
 | **Dropout** | 0.2 | **0.3** |
 | **ReLU** | Estándar | **inplace=True (optimizado)** |
-
-### Justificación del Cambio
-
-#### Problemas del Modelo Anterior
-- ❌ **Underfitting extremo**: Accuracy ~10-20% (casi aleatoria)
-- ❌ **Capacidad insuficiente**: Solo 1,500 parámetros para CIFAR-10
-- ❌ **Loss estancado**: No convergía ni en datos de entrenamiento
-- ❌ **GAP demasiado agresivo**: Perdía información espacial crucial
-
-#### Ventajas del Modelo Actual
-- ✅ **Mayor capacidad**: 2.1M parámetros para aprender patrones complejos
-- ✅ **Arquitectura probada**: VGGnet es estable y efectiva para visión
-- ✅ **Softmax explícito**: Proporciona probabilidades interpretables
-- ✅ **Clasificador robusto**: Capas densas con regularización adecuada
-- ✅ **Balance recursos/rendimiento**: Suficiente capacidad sin ser excesivo
 
 ### Arquitectura Final Implementada
 
@@ -389,18 +238,100 @@ class Cifar10CNN(nn.Module):
 
 ### Expectativas de Rendimiento
 
-Con esta nueva arquitectura se espera:
+Con esta nueva arquitectura se ha obtenido un accuracy del 60-80%, que el modelo converga (oss descendente y estable) y que el modelo tenga buena capacidad de generalización.
 
-- **Accuracy objetivo**: 60-80% (vs 10-20% anterior)
-- **Convergencia**: Loss descendente y estable
-- **Capacidad de generalización**: Mejor balance train/validation
-- **Tiempo de entrenamiento**: Moderadamente más alto pero manejable
-- **Uso de memoria**: Incremento controlado compatible con recursos limitados
+Si embargo, al aumentar el modelo también hemos aumentado el tiempo de entrenamiento y el uso de memoria.
 
-Este cambio representa un **compromiso equilibrado** entre eficiencia computacional y capacidad de aprendizaje, priorizando la funcionalidad del modelo sobre la optimización extrema de recursos.
+### Last layer activation
+
+La capa final utiliza una función Softmax para convertir los logits en probabilidades normalizadas cuya suma es igual a uno, permitiendo interpretar cada salida como el nivel de confianza del modelo en cada clase.
 
 
+### Other Considerations
+
+Se han implementado las siguientes tecnicas en el modelo:
+
+- **Dropout(0.3)**: Regularización para prevenir overfitting
+- **Padding=1**: Mantiene dimensiones espaciales en convoluciones
+- **Flatten**: Convierte feature maps 2D a vector 1D para clasificador
+
+## Training
+
+El proceso de entrenamiento consiste en una fase de propagación hacia adelante, cálculo de la pérdida, retropropagación del error y actualización de los parámetros mediante un optimizador AdamW con regularización L2. Se monitoriza la accuracy en validación para aplicar early stopping y conservar el modelo con mejor desempeño.
+
+### Training hyperparameters
+
+- **Batch Size**: 32 (balance entre estabilidad y memoria)
+- **Learning Rate**: 5e-4 (conservador para convergencia estable)
+- **Optimizer**: AdamW con weight_decay=1e-4 (regularización L2)
+- **Épocas**: 60 con early stopping basado en validation accuracy
+- **Criterio**: CrossEntropyLoss para clasificación multiclase
+
+### Loss function graph
+
+![image](../../outs/exercise_05/loss_plot.png)
+
+### Discussion of the training process
+
+Durante el entrenamiento del modelo basado en Global Average Pooling se observó un estancamiento temprano de la pérdida y una accuracy cercana al azar, lo que evidenció un caso claro de underfitting. Tras aumentar la capacidad mediante una arquitectura tipo VGG, la pérdida mostró una tendencia descendente más estable y la accuracy mejoró significativamente tanto en entrenamiento como en validación. El uso de regularización y data augmentation permitió controlar el posible sobreajuste derivado del incremento de parámetros.
+
+## Evaluation
+
+### Evaluation metrics
+
+La evaluación final se realiza sobre los conjuntos de entrenamiento, validación y prueba utilizando accuracy, F1-score y matriz de confusión.
+
+![image](../../outs/exercise_04/loss_plot.png)
 
 
+Metrics for each dataset is depicted: 
+
+![image](../../outs/exercise_05/metrics.png)
+
+### Evaluation results
+
+Here you have examples of evaluation results for train, validation and test sets.
+
+Example for train set:
+
+![image](../../outs/exercise_04/train_confusion_matrix.png)
 
 
+Example for validation set:
+
+![image](../../outs/exercise_04/validation_confusion_matrix.png)
+
+
+Example for test set:
+
+![image](../../outs/exercise_04/test_confusion_matrix.png)
+
+Los resultados muestran una mejora sustancial al pasar del modelo con Global Average Pooling al modelo convolucional tipo VGG. Mientras que el primero presentaba un rendimiento cercano a la clasificación aleatoria, el segundo alcanza valores de accuracy considerablemente superiores y una matriz de confusión con mayor concentración en la diagonal principal, lo que indica un mayor número de predicciones correctas.
+
+
+### Discussion of the results
+
+El modelo resuelve el problema extrayendo características jerárquicas mediante convoluciones y transformándolas posteriormente en decisiones de clasificación a través de capas densas. 
+
+El primer modelo con GAP presentó underfitting debido a su limitada capacidad representacional. 
+
+El segundo modelo con arquitectura VGG permitió aprender patrones más complejos, aunque con mayor costo computacional. La combinación de mayor capacidad y técnicas de regularización favorece una buena generalización sobre datos similares a los de entrenamiento.
+
+
+## Design Feedback loops
+
+### Proceso de Mejora del Modelo
+
+En una primera fase se priorizó la eficiencia computacional mediante un modelo con muy pocos parámetros. Tras analizar las métricas y detectar underfitting, se decidió aumentar la complejidad del modelo adoptando una arquitectura más profunda y robusta. Este cambio produjo una mejora significativa en el rendimiento.
+
+El proceso de diseño se basó en el analisis de la pérdida, la accuracy y la matriz de confusión, para comprobar la capacidad de generalización del modelo y detección de problemas como underfitting o overfitting (no presente en este ejecicio).
+
+## Questions
+
+### Which are the differences you found between the implemented models?
+
+El modelo anterior, basado en Global Average Pooling, presentaba una capacidad muy limitada y no lograba aprender representaciones discriminativas adecuadas, lo que resultó en underfitting severo. El modelo actual, inspirado en VGG, incrementa significativamente el número de parámetros y la profundidad, permitiendo capturar patrones espaciales más complejos y alcanzar un rendimiento notablemente superior.
+
+### Does the model generalizes well to new data?
+
+El modelo convolucional presenta una buena capacidad de generalización cuando los datos nuevos comparten características similares con CIFAR-10, como tamaño reducido y objetos relativamente centrados. Las convoluciones favorecen la invariancia a pequeñas traslaciones y la reutilización de filtros, lo que reduce el riesgo de sobreajuste. No obstante, la generalización puede verse limitada ante cambios drásticos de dominio, resolución o distribución de datos. En condiciones similares al dataset original, se espera un comportamiento robusto y estable.
