@@ -51,13 +51,13 @@ El conjunto de datos CIFAR-10 está compuesto por 60.000 imágenes en color de 3
 
 #### Partición de Datasets: Train, Validation y Test
 
-En Machine Learning es fundamental dividir los datos en **3 conjuntos independientes**:
+En Machine Learning es fundamental dividir los datos en 3 conjuntos independientes:
 
 | **Conjunto** | **Propósito** | **¿Cuándo se usa?** |
 |--------------|---------------|-------------------|
 | **Train** | Entrenar el modelo (ajustar pesos) | Durante cada época de entrenamiento |
 | **Validation** | Seleccionar mejor modelo y ajustar hiperparámetros | Durante entrenamiento para early stopping |
-| **Test** | Evaluación final del modelo | **Solo al final**, para reportar rendimiento real |
+| **Test** | Evaluación final del modelo | Solo al final, para reportar rendimiento real |
 
 #### Metodología seleccionada
 
@@ -87,7 +87,7 @@ Se ha optado por la distribución estándar de dividir las imagenes de train ent
 
 - El modelo "ve" el conjunto de test durante el entrenamiento
 - Se pierde la evaluación completamente ciega, los hiperparámetros se ajustan según el "test"
-- **Resultado**:  optimismo sesgado en las métricas finales, rendimiento inflado.
+- Resultado:  optimismo sesgado en las métricas finales, rendimiento inflado.
 
 
 ### Data preparation and preprocessing
@@ -95,15 +95,14 @@ Se ha optado por la distribución estándar de dividir las imagenes de train ent
 Como se ha explicado anteriormente, se utiliza la división estándar de CIFAR-10:
 - **Train (40k, 80%)** + **Validation (10k, 20%)** del conjunto original de entrenamiento
 - **Test (10k)** se mantiene intacto para evaluación final
-- **Normalización**: Media y desviación estándar específicas de CIFAR-10
-- **Conversión a tensor**: Transformación de PIL Image a tensor PyTorch
 
 ### Data augmentation
 
 **Aplicado solo al conjunto de entrenamiento:**
 - **RandomHorizontalFlip()**: Volteo horizontal aleatorio para aumentar variabilidad
 - **RandomCrop(32, padding=4)**: Recortes aleatorios con padding para simular traslaciones
-- **Objetivo**: Mejorar la generalización del modelo CNN y reducir overfitting
+
+El objetivo es mejorar la generalización del modelo CNN y reducir overfitting
 
 ## Model Considerations
 
@@ -126,9 +125,9 @@ Para una tarea de clasificación multiclase como CIFAR-10, la función de pérdi
 
 ### Possible architectures
 
-## Modelo CNN Optimizado con Global Average Pooling
+#### Modelo CNN Optimizado con Global Average Pooling
 
-### Arquitectura del Modelo Implementado
+##### Arquitectura del Modelo Implementado
 
 Hemos implementado un modelo CNN extremadamente optimizado para sistemas con recursos limitados, utilizando **Global Average Pooling (GAP)** como técnica principal de reducción de parámetros:
 
@@ -157,7 +156,7 @@ class Cifar10CNN(nn.Module):
         )
 ```
 
-**Configuración optimizada para recursos limitados:**
+Esta configuración está optimizada para recursos limitados:
 
 - **Batch Size**: 16 (reducido de 32 para menor uso de memoria)
 - **Épocas**: 30 (reducido de 70 para entrenamiento más rápido)  
@@ -192,22 +191,21 @@ El modelo actual sacrifica demasiado rendimiento por eficiencia. Se necesita enc
 
 ### Descripción del Cambio
 
-Debido al **underfitting severo** detectado en el modelo anterior, se decidió cambiar la arquitectura del **Global Average Pooling (GAP)** a una **arquitectura VGGnet más tradicional** que proporcione mayor capacidad de aprendizaje.
+Debido al underfitting severo detectado en el modelo anterior, se decidió cambiar la arquitectura del Global Average Pooling (GAP) a una arquitectura VGGnet que proporcione mayor capacidad de aprendizaje.
 
 ### Tabla Comparativa de Arquitecturas
 
 | **Aspecto** | **Modelo Anterior (GAP)** | **Modelo Actual (VGGnet)** |
 |-------------|---------------------------|----------------------------|
 | **Descripción** | CNN minimalista con GAP | CNN estilo VGGnet tradicional |
-| **Canales Conv** | 3 → 8 → 16 | 3 → **16 → 32** |
-| **Feature Extraction** | 2 Conv + GAP | **2 Conv + MaxPool** |
-| **Pooling** | AdaptiveAvgPool2d(1,1) | **MaxPool2d(2,2)** |
-| **Clasificador** | Flatten → Dropout → Linear(16,10) | **Flatten → Linear(8192,256) → ReLU → Dropout → Linear(256,10)** |
-| **Activación Final** | Sin Softmax | **nn.Softmax(dim=1)** |
-| **Parámetros Totales** | ~1,500 | **~2,100,000** |
-| **Factor de Cambio** | Base | **1400x más parámetros** |
-| **Dropout** | 0.2 | **0.3** |
-| **ReLU** | Estándar | **inplace=True (optimizado)** |
+| **Canales Conv** | 3 → 8 → 16 | 3 → 16 → 32 |
+| **Feature Extraction** | 2 Conv + GAP | 2 Conv + MaxPool |
+| **Pooling** | AdaptiveAvgPool2d(1,1) | MaxPool2d(2,2) |
+| **Clasificador** | Flatten → Dropout → Linear(16,10) | Flatten → Linear(8192,256) → ReLU → Dropout → Linear(256,10) |
+| **Activación Final** | Sin Softmax | nn.Softmax(dim=1) |
+| **Parámetros Totales** | ~1,500 | ~2,100,000 |
+| **Factor de Cambio** | Base | 1400x más parámetros |
+
 
 ### Arquitectura Final Implementada
 
@@ -238,7 +236,7 @@ class Cifar10CNN(nn.Module):
 
 ### Expectativas de Rendimiento
 
-Con esta nueva arquitectura se ha obtenido un accuracy del 60-80%, que el modelo converga (oss descendente y estable) y que el modelo tenga buena capacidad de generalización.
+Con esta nueva arquitectura se ha obtenido un accuracy del 70%, que el modelo converga (loss descendente y estable) y que el modelo tenga buena capacidad de generalización.
 
 Si embargo, al aumentar el modelo también hemos aumentado el tiempo de entrenamiento y el uso de memoria.
 
