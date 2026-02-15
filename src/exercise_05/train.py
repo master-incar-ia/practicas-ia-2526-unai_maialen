@@ -84,7 +84,7 @@ def train_model(output_folder: Path, device: torch.device):
         num_workers=0,
     )
 
-    model = MultiPerceptron(input_dim=3072, hidden_dims=[512, 256, 128], output_dim=10).to(device)
+    model = MultiPerceptron(input_dim=3072, hidden_dims=[256, 128, 64], output_dim=10).to(device)
     criterion = nn.CrossEntropyLoss()
 
     optimizer = optim.AdamW(model.parameters(), lr=5e-4, weight_decay=1e-4)

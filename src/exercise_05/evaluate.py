@@ -125,7 +125,7 @@ if __name__ == "__main__":
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-    model = MultiPerceptron(input_dim=3072, hidden_dims=[512, 256, 128], output_dim=10).to(device)
+    model = MultiPerceptron(input_dim=3072, hidden_dims=[256, 128, 64], output_dim=10).to(device)
     model.load_state_dict(torch.load(output_folder / "best_model.pth", map_location=device))
 
     class_names = train_full_eval.data.classes
